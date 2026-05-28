@@ -1,5 +1,5 @@
 # cwf-ns
-Store scripts related to habitat modelling in Nova Scotia.
+Store scripts related to habitat modelling in Newfoundland.
 
 # Overview
 
