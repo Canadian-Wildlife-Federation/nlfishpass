@@ -1,4 +1,4 @@
-# cwf-ns
+# cwf-nl
 Store scripts related to habitat modelling in Newfoundland.
 
 # Overview
