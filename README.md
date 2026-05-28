@@ -3,7 +3,7 @@ Store scripts related to habitat modelling in Newfoundland.
 
 # Overview
 
-This project contains a set of scripts to create and maintain an aquatic connectivity / fish passage database for Nova Scotia to:
+This project contains a set of scripts to create and maintain an aquatic connectivity / fish passage database for Newfoundland to:
 * Track known barriers to fish passage (e.g., dams and stream crossings)
 * Model potential barriers to fish passage (stream gradient, road/rail/trail stream crossings)
 * Model passability/accessibility of streams based on barriers and species swimming ability
