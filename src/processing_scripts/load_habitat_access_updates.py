@@ -80,6 +80,8 @@ def main():
             GRANT ALL ON TABLE {dbTargetSchema}.{datatable} TO cwf_tech;
 
             GRANT ALL ON TABLE {dbTargetSchema}.{datatable} TO cwf_analyst;
+            GRANT ALL ON SEQUENCE {dbTargetSchema}.{datatable}_fid_seq TO cwf_tech;
+
             -- Index: habitat_access_updates_geometry_geom_idx
 
             -- DROP INDEX IF EXISTS {dbTargetSchema}.{datatable}_geometry_geom_idx;
@@ -136,7 +138,7 @@ def main():
         with match as (
         SELECT a.id as stream_id, b.id as pntid, st_linelocatepoint(a.geometry, b.snapped_point) as streammeasure
         FROM {dbTargetSchema}.{dbTargetStreamTable} a, {dbTargetSchema}.{datatable} b
-        WHERE st_intersects(a.geometry, st_buffer(b.snapped_point, 0.0001))
+        WHERE st_intersects(a.geometry, st_buffer(b.snapped_point, 0.001))
         )
         UPDATE {dbTargetSchema}.{datatable}
         SET stream_id = a.stream_id, stream_measure = a.streammeasure
