@@ -155,7 +155,7 @@ def joinBarrierUpdates(connection):
         barrierTypes = cursor.fetchall()
 
     for bType in barrierTypes:  # iterate over barrier type since updates can apply to crossings or dams. Some dams have fishway crossing points in the same spot.
-        barrier = bType[0]
+        barrier = str(bType[0]).strip()
         query = f"""
         with match AS (
             SELECT
@@ -246,9 +246,12 @@ def processUpdates(connection):
     connection.commit()
 
     # Insert new points into barrier table
-    # Delete points where indicated
-    newDeleteQuery = f"""
+    newQuery = f"""
         -- new points
+        UPDATE {dbTargetSchema}.{dbTargetTable}
+        SET barrier_id = gen_random_uuid()
+        WHERE barrier_id IS NULL;
+
         INSERT INTO {dbTargetSchema}.{dbBarrierTable} (
             update_id,
             modelled_id,
@@ -279,7 +282,17 @@ def processUpdates(connection):
         SET barrier_id = b.id
         FROM {dbTargetSchema}.{dbBarrierTable} b
         WHERE b.update_id = {dbTargetSchema}.{dbTargetTable}.update_id::varchar;
+    """
 
+    with connection.cursor() as cursor:
+        cursor.execute(newQuery)
+    connection.commit()
+
+    # join updates to nearest barrier
+    joinBarrierUpdates(connection)
+
+    # Delete points
+    deleteQuery = f"""
         -- deleted points
         DELETE FROM {dbTargetSchema}.{dbBarrierTable}
         WHERE id IN (
@@ -292,7 +305,7 @@ def processUpdates(connection):
     """
 
     with connection.cursor() as cursor:
-        cursor.execute(newDeleteQuery)
+        cursor.execute(deleteQuery)
     connection.commit()
 
     # add new points into the passability table

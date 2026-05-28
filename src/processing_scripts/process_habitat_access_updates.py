@@ -68,7 +68,7 @@ def getUpstreamDownstream(conn):
             SELECT a.id as stream_id, b.id as barrier_id
             FROM {dbTargetSchema}.{dbTargetStreamTable} a,
                 {dbTargetSchema}.{dbHabAccessUpdates} b
-            WHERE ST_DWithin(ST_endPoint(a.geometry), b.snapped_point, 10)
+            WHERE ST_DWithin(ST_endPoint(a.geometry), b.snapped_point, 0.1)
         )
         UPDATE {dbTargetSchema}.{dbHabAccessUpdates}
             SET stream_id_up = a.stream_id
@@ -83,7 +83,7 @@ def getUpstreamDownstream(conn):
             SELECT a.id as stream_id, b.id as barrier_id
             FROM {dbTargetSchema}.{dbTargetStreamTable} a,
                 {dbTargetSchema}.{dbHabAccessUpdates} b
-            WHERE ST_DWithin(ST_startPoint(a.geometry), b.snapped_point, 10)
+            WHERE ST_DWithin(ST_startPoint(a.geometry), b.snapped_point, 0.1)
         )
         UPDATE {dbTargetSchema}.{dbHabAccessUpdates}
             SET stream_id_down = a.stream_id
@@ -186,14 +186,14 @@ def processStreams(points, codes, conn):
     print("Processing updates to accessibility and habitat")
 
     for point in points:
-        species = point['species'].strip()
-        update_type = point['update_type'].strip()
+        species = point['species'].strip() if point['species'] is not None else None
+        update_type = point['update_type'].strip() if point['update_type'] is not None else None
         stream_id_up = point['stream_id_up']
         stream_id_down = point['stream_id_down']
         pair_id = point['pair_id']
         upstream = point['upstream']
         downstream = point['downstream']
-        habitat_type = point['habitat_type'].strip()
+        habitat_type = point['habitat_type'].strip() if point['habitat_type'] is not None else None
         # comments = point['comments']
 
         if stream_id_up is None:
@@ -563,7 +563,7 @@ def processStreams(points, codes, conn):
                     conn.commit()
 
             else:
-                pass
+                continue
 
 def addComments(points, conn):
 
